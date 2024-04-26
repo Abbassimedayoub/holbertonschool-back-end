@@ -1,32 +1,34 @@
 #!/usr/bin/python3
-"""Returns info about his/her TODO list progress by giving employee ID"""
-
-from requests import get
-from sys import argv
+"""Use a REST API for a given employee ID, and
+returns information about his/her TODO list progress"""
+import requests
+import sys
 
 
 if __name__ == "__main__":
-    response = get('https://jsonplaceholder.typicode.com/todos/')
-    data = response.json()
-    completed = 0
-    total = 0
-    tasks = []
-    response2 = get('https://jsonplaceholder.typicode.com/users/')
-    data2 = response2.json()
-    for i in data2:
-        if i.get('id') == int(argv[1]):
-            employee = i.get('name')
+    if len(sys.argv) != 2:
+        print(f"No employee id in argument")
+        sys.exit(1)
 
-    for i in data:
-        if i.get('userId') == int(argv[1]):
-            total += 1
+    BASE_URL = "https://jsonplaceholder.typicode.com"
+    EMPLOYEE_ID = sys.argv[1]
 
-            if i.get('completed') is True:
-                completed += 1
-                tasks.append(i.get('title'))
+    RESPONSE = requests.get(
+        f"{BASE_URL}/users/{EMPLOYEE_ID}/todos",
+        params={"_expand": "user"}
+    )
+    data = RESPONSE.json()
 
-    print("Employee {} is done with tasks({}/{}):".format(employee,
-                                                          completed, total))
+    if not len(data):
+        print("RequestError:", 404)
+        sys.exit(1)
 
-    for i in tasks:
-        print("\t {}".format(i))
+    TASK_TITLE = [task["title"] for task in data if task["completed"]]
+    TOTAL_NUMBER_OF_TASKS = len(data)
+    NUMBER_OF_DONE_TASKS = len(TASK_TITLE)
+    EMPLOYEE_NAME = data[0]["user"]["name"]
+
+    print(f"Employee {EMPLOYEE_NAME} is done with tasks"
+          f"({NUMBER_OF_DONE_TASKS}/{TOTAL_NUMBER_OF_TASKS}):")
+    for title in TASK_TITLE:
+        print("\t ", title)
