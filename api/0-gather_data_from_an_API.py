@@ -1,20 +1,20 @@
 #!/usr/bin/python3
-"""Use a REST API for a given employee ID, and
-returns information about his/her TODO list progress"""
+"""Python script to fetch and display TODO list
+progress for a given employee ID using a REST API"""
 import requests
 import sys
 
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print(f"No employee id in argument")
+        print(f"Usage: python3 {__file__} employee_id(int)")
         sys.exit(1)
 
-    BASE_URL = "https://jsonplaceholder.typicode.com"
+    URL = "https://jsonplaceholder.typicode.com"
     EMPLOYEE_ID = sys.argv[1]
 
     RESPONSE = requests.get(
-        f"{BASE_URL}/users/{EMPLOYEE_ID}/todos",
+        f"{URL}/users/{EMPLOYEE_ID}/todos",
         params={"_expand": "user"}
     )
     data = RESPONSE.json()

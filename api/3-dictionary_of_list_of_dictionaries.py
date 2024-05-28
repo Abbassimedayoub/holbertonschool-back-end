@@ -1,31 +1,27 @@
 #!/usr/bin/python3
-'''
-Python script for exporting data in JSON format
-'''
+"""Script to retrieve data from a REST API
+and export it in JSON format."""
 import json
 import requests
 
+
 if __name__ == "__main__":
-    users_endpoint = 'https://jsonplaceholder.typicode.com/users'
-    todos_endpoint = 'https://jsonplaceholder.typicode.com/todos'
+    URL = "https://jsonplaceholder.typicode.com"
 
-    users_data = requests.get(users_endpoint).json()
-    todos_data = requests.get(todos_endpoint).json()
+    USERS = requests.get(f"{URL}/users").json()
 
-    all_user_tasks = {}
+    USER_TASK = {}
+    for user in USERS:
+        tasks = requests.get(f"{URL}/users/{user['id']}/todos").json()
 
-    for user in users_data:
-        user_id = str(user["id"])
-        all_user_tasks[user_id] = []
+        USER_TASK[user["id"]] = []
+        for task in tasks:
+            task_dict = {
+                "username": user["username"],
+                "task": task["title"],
+                "completed": task["completed"]
+            }
+            USER_TASK[user["id"]].append(task_dict)
 
-        for task in todos_data:
-            if task["userId"] == user["id"]:
-                task_info = {
-                    "username": user["username"],
-                    "task": task["title"],
-                    "completed": task["completed"]
-                }
-                all_user_tasks[user_id].append(task_info)
-
-    with open("todo_all_employees.json", 'w') as json_file:
-        json.dump(all_user_tasks, json_file)
+    with open("todo_all_employees.json", "w") as file:
+        json.dump(USER_TASK, file)

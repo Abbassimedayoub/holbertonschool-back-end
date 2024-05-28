@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Script that fetch and export employee TODO list
+"""Script to fetch and export employee TODO list
 progress from a REST API to CSV"""
 import csv
 import requests
